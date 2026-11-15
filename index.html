@@ -8,12 +8,13 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<link rel="stylesheet" href="./style.css">
+<meta name="theme-color" content="#2563eb"><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="./style.css">
 </head>
 <body>
 <header class="topbar"><div class="topbar-inner">
 <div class="logo">Gruz<span>Net</span></div>
 <div class="nav-actions">
+<button id="theme-btn" class="icon-btn" type="button" aria-label="Theme">🌙</button>
 <select id="language-select" class="btn small secondary" style="width:auto"><option value="az">🇦🇿 AZ</option><option value="ru">🇷🇺 RU</option></select>
 <div id="user-mini" class="user-mini"></div>
 <button id="logout-btn" class="btn small secondary hidden" type="button" data-i18n="logout">Çıxış</button>
@@ -50,6 +51,8 @@
 </section>
 
 <section id="user-panel">
+<div class="hero"><h1 data-i18n="heroT">Yük və tır — bir yerdə</h1><p data-i18n="heroP">Tez elan ver, düzgün tırı və ya yükü tap.</p>
+<div class="actions"><button class="btn" type="button" id="h-cargo" data-i18n="addCargo">🚚 Yük elan et</button><button class="btn ghost" type="button" id="h-truck" data-i18n="addTruck">🚛 Boş tır elan et</button><button class="btn ghost hidden" type="button" id="install-btn" data-i18n="install">📲 Quraşdır</button></div></div>
 <div class="tabs">
 <button class="tab active" data-main-tab="cargo" type="button" data-i18n="cargo">Yük elanları</button>
 <button class="tab" data-main-tab="truck" type="button" data-i18n="trucks">Boş tırlar</button></div>
@@ -77,11 +80,24 @@
 <button class="tab" data-profile-tab="favs" type="button">❤️</button></div>
 <div id="profile-ads" class="ad-list"></div>
 </section>
+
+<section id="page-help" class="page hidden"><h2 data-i18n="help">Kömək</h2><div class="faq" id="faq"></div></section>
+<section id="page-contact" class="page hidden"><h2 data-i18n="contact">Əlaqə</h2>
+<div class="cc"><a id="c-wa" target="_blank" rel="noopener"><b>💬</b>WhatsApp<div class="muted">+994 70 253 89 45</div></a><a href="tel:+994702538945"><b>📞</b><span data-i18n="call">Zəng</span><div class="muted">+994 70 253 89 45</div></a></div>
+<form id="contact-form" class="card"><h3 data-i18n="writeUs">Bizə yazın</h3>
+<div class="form-group"><label data-i18n="name">Ad, soyad</label><input id="c-name" class="form-control" maxlength="80" required></div>
+<div class="form-group"><label data-i18n="phone">Telefon</label><input id="c-phone" class="form-control" type="tel" maxlength="16" required></div>
+<div class="form-group"><label data-i18n="message">Mesaj</label><textarea id="c-msg" class="form-control" rows="4" maxlength="1000" required></textarea></div>
+<button class="btn" type="submit" id="c-send" data-i18n="send">Göndər</button></form></section>
+<section id="page-legal" class="page hidden legal"><h2 data-i18n="legal">Haqqında və qaydalar</h2><div class="card" id="legal-body"></div></section>
 </main>
+<footer class="footer"><a data-page="help" data-i18n="help">Kömək</a><a data-page="contact" data-i18n="contact">Əlaqə</a><a data-page="legal" data-i18n="legal">Qaydalar</a><div style="margin-top:8px">© GruzNet</div></footer>
 
 <nav id="bottom-nav" class="bottom-nav">
 <button class="nav-side active" data-bottom="home" type="button"><span class="nav-icon">⌂</span><span data-i18n="ads">Elanlar</span></button>
+<button class="nav-side" data-page="help" type="button"><span class="nav-icon">?</span><span data-i18n="help">Kömək</span></button>
 <button id="nav-add" class="nav-add" type="button" aria-label="+"><span>+</span></button>
+<button class="nav-side" data-page="contact" type="button"><span class="nav-icon">✉</span><span data-i18n="contact">Əlaqə</span></button>
 <button class="nav-side" data-bottom="profile" type="button"><span class="nav-icon">♙</span><span data-i18n="profile">Profil</span></button>
 </nav>
 
@@ -125,5 +141,6 @@
 
 <div id="toast" class="toast hidden"></div>
 <script src="script.js"></script>
+<script src="extra.js"></script>
 </body>
 </html>

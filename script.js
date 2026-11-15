@@ -132,7 +132,7 @@ function card(a,own){
   <div class="detail"><b>${t("expires")}:</b> ${esc(a.expiresAt||"—")}</div></div>
   <div class="ad-footer"><div class="muted">👤 ${esc(a.ownerName||"")}</div>
   <div class="ad-tools"><span class="views">👁 ${a.views||0}</span>
-  <button class="favorite-btn${fav?" active":""}" type="button" onclick="toggleFav('${a.id}','${k}')">${fav?"❤️":"♡"}</button>
+  <button class="favorite-btn" type="button" onclick="shareAd('${a.id}','${k}')">↗</button><button class="favorite-btn${fav?" active":""}" type="button" onclick="toggleFav('${a.id}','${k}')">${fav?"❤️":"♡"}</button>
   ${own?`<button class="btn small secondary" type="button" onclick="editAd('${a.collection}','${a.id}')">${t("edit")}</button>
   ${a.status==="ACTIVE"?`<button class="btn small success" type="button" onclick="renewAd('${a.collection}','${a.id}')">${t("renew")}</button><button class="btn small danger" type="button" onclick="archiveAd('${a.collection}','${a.id}')">${t("archive")}</button>`:""}`
   :`<button class="btn small success" type="button" onclick="contact('${a.collection}','${a.id}','wa','${esc(wa)}')">${t("wa")}</button><button class="btn small" type="button" onclick="contact('${a.collection}','${a.id}','tel','tel:${esc(a.ownerPhone)}')">${t("call")}</button>`}
