@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="GruzNet — logistika birjası">
+<title>GruzNet - Logistika Birjası</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+<div class="logo">Gruz<span>Net</span></div>
+<div class="nav-actions">
+<select id="language-select" class="btn small secondary" style="width:auto"><option value="az">🇦🇿 AZ</option><option value="ru">🇷🇺 RU</option></select>
+<div id="user-mini" class="user-mini"></div>
+<button id="logout-btn" class="btn small secondary hidden" type="button" data-i18n="logout">Çıxış</button>
+</div></div></header>
+
+<section id="auth-screen" class="auth-wrap hidden"><div class="auth-card">
+<div class="tabs">
+<button class="tab active" data-auth-tab="login" type="button" data-i18n="login">Giriş</button>
+<button class="tab" data-auth-tab="register" type="button" data-i18n="register">Qeydiyyat</button></div>
+<form id="auth-form">
+<h1>GruzNet</h1>
+<p class="muted" id="auth-desc"></p>
+<div id="register-extra" class="hidden"><div class="grid">
+<div class="form-group"><label data-i18n="name">Ad, soyad</label><input id="reg-name" class="form-control" maxlength="100" autocomplete="name"></div>
+<div class="form-group"><label data-i18n="role">Rol</label><select id="reg-role" class="form-control"><option value="CARGO_OWNER" data-i18n="owner">Yük sahibi / Dispetçer</option><option value="CARRIER" data-i18n="carrier">Daşıyıcı</option></select></div>
+</div></div>
+<div class="form-group"><label data-i18n="phone">Telefon</label><input id="auth-phone" class="form-control" type="tel" inputmode="tel" autocomplete="tel" placeholder="+998901234567" maxlength="16" required></div>
+<div class="form-group"><label data-i18n="password">Şifrə</label><input id="auth-password" class="form-control" type="password" minlength="6" required></div>
+<button id="login-btn" class="btn" style="width:100%" type="submit"></button>
+</form></div></section>
+
+<main id="app" class="container">
+<section id="admin-panel" class="hidden">
+<div class="tabs">
+<button class="tab active" data-admin-tab="stats" type="button" data-i18n="stats">Statistika</button>
+<button class="tab" data-admin-tab="ads" type="button" data-i18n="ads">Elanlar</button>
+<button class="tab" data-admin-tab="users" type="button" data-i18n="users">İstifadəçilər</button></div>
+<div id="admin-stats" class="admin-view"><div class="stats">
+<div class="stat"><span data-i18n="users">İstifadəçilər</span><b id="st-users">0</b></div>
+<div class="stat"><span data-i18n="cargo">Yüklər</span><b id="st-cargo">0</b></div>
+<div class="stat"><span data-i18n="trucks">Boş tırlar</span><b id="st-trucks">0</b></div></div></div>
+<div id="admin-ads" class="admin-view hidden"><div id="admin-ads-list"></div></div>
+<div id="admin-users" class="admin-view hidden"><div class="card" style="overflow:auto"><table class="admin-table"><thead><tr><th>Ad</th><th>Telefon</th><th>Rol</th><th></th></tr></thead><tbody id="admin-users-list"></tbody></table></div></div>
+</section>
+
+<section id="user-panel">
+<div class="tabs">
+<button class="tab active" data-main-tab="cargo" type="button" data-i18n="cargo">Yük elanları</button>
+<button class="tab" data-main-tab="truck" type="button" data-i18n="trucks">Boş tırlar</button></div>
+<div class="searchbar">
+<input id="s-text" class="form-control" data-i18n-ph="searchPh" placeholder="Bakı, Daşkənd, qoz, taxta...">
+<select id="s-from" class="form-control"></select>
+<select id="s-to" class="form-control"></select>
+<select id="s-truck" class="form-control"></select>
+<select id="s-sort" class="form-control"><option value="new" data-i18n="newest">Ən yenilər</option><option value="urgent" data-i18n="urgentFirst">Təcili əvvəl</option><option value="old" data-i18n="oldest">Ən köhnələr</option></select>
+<button id="s-clear" class="btn secondary" type="button" data-i18n="clear">Təmizlə</button>
+</div>
+<div id="ad-list" class="ad-list"></div>
+</section>
+
+<section id="profile-panel" class="hidden">
+<div class="card"><div class="profile-hero"><div class="profile-avatar" id="p-avatar">P</div>
+<div><h2 id="p-name"></h2><div class="muted" id="p-role"></div><div class="muted" id="p-phone"></div></div></div>
+<div class="profile-stats">
+<div class="profile-stat"><span class="muted" data-i18n="active">Aktiv</span><b id="p-active">0</b></div>
+<div class="profile-stat"><span class="muted" data-i18n="views">Baxış</span><b id="p-views">0</b></div>
+<div class="profile-stat"><span class="muted" data-i18n="favs">Favori</span><b id="p-favs">0</b></div></div></div>
+<div class="tabs">
+<button class="tab active" data-profile-tab="active" type="button" data-i18n="active">Aktiv</button>
+<button class="tab" data-profile-tab="past" type="button" data-i18n="past">Keçmiş</button>
+<button class="tab" data-profile-tab="favs" type="button">❤️</button></div>
+<div id="profile-ads" class="ad-list"></div>
+</section>
+</main>
+
+<nav id="bottom-nav" class="bottom-nav">
+<button class="nav-side active" data-bottom="home" type="button"><span class="nav-icon">⌂</span><span data-i18n="ads">Elanlar</span></button>
+<button id="nav-add" class="nav-add" type="button" aria-label="+"><span>+</span></button>
+<button class="nav-side" data-bottom="profile" type="button"><span class="nav-icon">♙</span><span data-i18n="profile">Profil</span></button>
+</nav>
+
+<div id="ad-modal" class="modal" role="dialog" aria-modal="true"><div class="modal-box">
+<div class="modal-head"><h2 id="modal-title"></h2><button id="modal-close" class="close" type="button">×</button></div>
+<form id="ad-form">
+<input type="hidden" id="f-id"><input type="hidden" id="f-kind" value="cargo">
+<div class="tabs" id="kind-tabs">
+<button type="button" class="tab active" data-kind="cargo" data-i18n="addCargo">🚚 Yük elan et</button>
+<button type="button" class="tab" data-kind="truck" data-i18n="addTruck">🚛 Boş tır elan et</button></div>
+<div class="form-group" id="paste-box"><label data-i18n="paste">WhatsApp mətnini yapışdır</label>
+<textarea id="f-paste" class="form-control" rows="3" placeholder="🇺🇿 Samarqand ➜ 🇷🇺 Moskva, qoz, 24 ton, tent, 3700$ nağd"></textarea>
+<button id="f-parse" class="btn small secondary" type="button" style="margin-top:6px" data-i18n="autofill">Avto-doldur</button></div>
+<div class="grid">
+<div class="form-group cg"><label data-i18n="product">Yük</label><input id="f-product" class="form-control" maxlength="120"></div>
+<div class="form-group"><label data-i18n="truckType">Tır tipi</label><select id="f-truck" class="form-control" required></select></div>
+<div class="form-group"><label data-i18n="volume">Həcm (m³)</label><select id="f-vol" class="form-control"></select></div>
+<div class="form-group"><label data-i18n="count">Tır sayı</label><input id="f-count" class="form-control" type="number" min="1" max="100" value="1"></div></div>
+<div class="grid">
+<div class="form-group"><label data-i18n="fromC">Haradan (ölkə)</label><select id="f-fc" class="form-control" required></select></div>
+<div class="form-group"><label data-i18n="from">Haradan (şəhər)</label><input id="f-from" class="form-control" maxlength="100" required></div>
+<div class="form-group"><label data-i18n="toC">Haraya (ölkə)</label><select id="f-tc" class="form-control" required></select></div>
+<div class="form-group"><label data-i18n="to">Haraya (şəhər)</label><input id="f-to" class="form-control" maxlength="100" required></div></div>
+<div class="grid cg">
+<div class="form-group"><label data-i18n="weight">Çəki (ton)</label><input id="f-weight" class="form-control" type="number" min="0.1" max="100" step="0.1"></div>
+<div class="form-group"><label data-i18n="customs">Gömrük</label><input id="f-customs" class="form-control" maxlength="100"></div></div>
+<div class="grid">
+<div class="form-group"><label data-i18n="payType">Ödəniş növü</label><select id="f-paytype" class="form-control"></select></div>
+<div class="form-group"><label data-i18n="price">Frakht</label><div class="grid" style="gap:6px;grid-template-columns:2fr 1fr"><input id="f-price" class="form-control" type="number" min="0" step="1"><select id="f-cur" class="form-control"><option>USD</option><option>AZN</option><option>RUB</option><option>UZS</option><option>EUR</option></select></div></div>
+<div class="form-group"><label data-i18n="advance">Avans (%)</label><input id="f-advance" class="form-control" type="number" min="0" max="100"></div>
+<div class="form-group"><label data-i18n="date">Yükləmə tarixi</label><input id="f-date" class="form-control" type="date" required></div>
+<div class="form-group"><label data-i18n="expires">Son tarix</label><input id="f-exp" class="form-control" type="date" required></div></div>
+<div class="chips">
+<label class="chip"><input type="checkbox" id="f-urgent"> 🔥 <span data-i18n="urgent">Təcili</span></label>
+<label class="chip cg"><input type="checkbox" id="f-ready"> ✅ <span data-i18n="ready">Yük hazırdır</span></label>
+<label class="chip cg"><input type="checkbox" id="f-adr"> ⚠️ ADR</label>
+<label class="chip"><input type="checkbox" id="f-nobroker"> 🚫 <span data-i18n="noBroker">Vasitəçisiz</span></label>
+<label class="chip cg"><input type="checkbox" id="f-seal"> 🔒 <span data-i18n="seal">Plomb daxildir</span></label></div>
+<div class="actions"><button id="f-submit" class="btn" type="submit" data-i18n="publish">Dərc et</button><button id="f-cancel" class="btn secondary" type="button" data-i18n="cancel">Ləğv et</button></div>
+</form></div></div>
+
+<div id="toast" class="toast hidden"></div>
+<script src="script.js"></script>
+</body>
+</html>
