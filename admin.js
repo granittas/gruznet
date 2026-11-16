@@ -17,7 +17,7 @@ auth.onAuthStateChanged(async u=>{
     me={id:u.uid,...s.data()};$("login").classList.add("hidden");$("panel").classList.remove("hidden");$("out").classList.remove("hidden");load();
   }catch(_){toast("Xəta. Firestore qaydalarını yoxlayın.","error");}
 });
-QA("[data-t]").forEach(b=>b.onclick=()=>{if(b.dataset.t==="ref")return load();QA("[data-t]").forEach(x=>x.classList.toggle("active",x===b));["dash","users","ads","msgs"].forEach(k=>$("s-"+k).classList.toggle("hidden",k!==b.dataset.t));});
+QA("[data-t]").forEach(b=>b.onclick=()=>{if(b.dataset.t==="ref")return load();QA("[data-t]").forEach(x=>x.classList.toggle("active",x===b));["dash","users","ads","msgs","imp"].forEach(k=>$("s-"+k).classList.toggle("hidden",k!==b.dataset.t));});
 async function load(){
   try{const g=c=>db.collection(c).limit(1000).get(),[u,c,t,m]=await Promise.all(["users","cargo_ads","truck_ads","messages"].map(g));
     users=u.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>ms(b)-ms(a));
@@ -54,3 +54,25 @@ window.delMsg=id=>confirm("Mesaj silinsin?")&&run(db.collection("messages").doc(
 function csv(n,rows){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+rows.map(r=>r.map(x=>'"'+String(x??"").replace(/"/g,'""')+'"').join(",")).join("\n")],{type:"text/csv"}));a.download=n;a.click();}
 $("ux").onclick=()=>csv("users.csv",[["Ad","Telefon","Rol","Bloklu","Tarix"],...users.map(u=>[u.fullName,u.phone,u.role,u.blocked?1:0,fmt(u)])]);
 $("ax").onclick=()=>csv("ads.csv",[["Növ","Haradan","Haraya","Yük","Sahib","Telefon","Status","Baxış"],...ads.map(a=>[a.coll,a.from,a.to,a.productName,a.ownerName,a.ownerPhone,a.status,a.views||0])]);
+
+// ===== WhatsApp idxalı =====
+let impRows=[];
+$("imf").onchange=async e=>{const f=e.target.files[0];if(!f)return;
+  try{impRows=JSON.parse(await f.text());if(!Array.isArray(impRows))throw 0;}catch(_){impRows=[];toast("JSON oxunmadı.","error");}
+  $("imi").textContent=impRows.length+" elan oxundu.";$("imb").disabled=!impRows.length;};
+$("imb").onclick=async()=>{
+  if(!impRows.length||!confirm(impRows.length+" elan idxal olunsun?"))return;
+  const d=Math.min(14,Math.max(1,Number($("imd").value)||3)),td=new Date().toISOString().slice(0,10),ex=new Date(Date.now()+d*864e5).toISOString().slice(0,10);
+  $("imb").disabled=true;let n=0;
+  try{for(let i=0;i<impRows.length;i+=400){const b=db.batch();
+    impRows.slice(i,i+400).forEach(r=>{const k=r.kind==="truck"?"truck_ads":"cargo_ads";
+      b.set(db.collection(k).doc(),{productName:String(r.productName||"Yük").slice(0,120),truckType:r.truckType||"Tent",volume:r.volume||"",truckCount:1,fromCountry:r.fromCountry||"",from:String(r.from||"").slice(0,100),toCountry:r.toCountry||"",to:String(r.to||"").slice(0,100),weight:Number(r.weight)||0,customs:"",payType:r.payType||"agree",price:Number(r.price)||0,currency:r.currency||"USD",advance:0,urgent:!!r.urgent,ready:!!r.ready,adr:!!r.adr,noBroker:!!r.noBroker,seal:!!r.seal,
+        status:"ACTIVE",views:0,imported:true,source:"whatsapp",ownerId:me.id,ownerName:"GruzNet (WhatsApp)",ownerPhone:r.ownerPhone||"",date:td,expiresAt:ex,createdAt:FV.serverTimestamp(),updatedAt:FV.serverTimestamp()});n++;});
+    await b.commit();}
+    toast(n+" elan idxal olundu.","success");load();}catch(e){toast("Xəta: "+(e.code||e.message),"error");}
+  $("imb").disabled=false;};
+$("imx").onclick=async()=>{
+  if(!confirm("İdxal olunmuş bütün elanlar silinsin?"))return;let n=0;
+  try{for(const c of["cargo_ads","truck_ads"]){const s=await db.collection(c).where("imported","==",true).get();
+    for(let i=0;i<s.docs.length;i+=400){const b=db.batch();s.docs.slice(i,i+400).forEach(d=>{b.delete(d.ref);n++;});await b.commit();}}
+    toast(n+" elan silindi.","success");load();}catch(e){toast("Xəta: "+(e.code||e.message),"error");}};

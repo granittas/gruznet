@@ -13,10 +13,16 @@
 <div class="form-group"><label>Şifrə</label><input id="pw" class="form-control" type="password" required></div>
 <button class="btn" style="width:100%" type="submit">Daxil ol</button></form></section>
 <main id="panel" class="container hidden">
-<div class="tabs"><button class="tab active" data-t="dash" type="button">📊 İdarə paneli</button><button class="tab" data-t="users" type="button">👥 İstifadəçilər</button><button class="tab" data-t="ads" type="button">📦 Elanlar</button><button class="tab" data-t="msgs" type="button">✉️ Mesajlar <b id="mc"></b></button><button class="tab" data-t="ref" type="button">🔄 Yenilə</button></div>
+<div class="tabs"><button class="tab active" data-t="dash" type="button">📊 İdarə paneli</button><button class="tab" data-t="users" type="button">👥 İstifadəçilər</button><button class="tab" data-t="ads" type="button">📦 Elanlar</button><button class="tab" data-t="msgs" type="button">✉️ Mesajlar <b id="mc"></b></button><button class="tab" data-t="imp" type="button">📥 İdxal</button><button class="tab" data-t="ref" type="button">🔄 Yenilə</button></div>
 <section id="s-dash"><div class="stats" id="stats"></div><div class="card"><h3>Son 7 gün: yeni qeydiyyat və elan</h3><div class="bars" id="bars"></div></div></section>
 <section id="s-users" class="hidden"><div class="tools"><input id="uq" class="form-control" placeholder="Ad və ya telefon..."><button class="btn secondary" id="ux" type="button">CSV</button></div><div class="card"><table class="admin-table"><thead><tr><th>Ad</th><th>Telefon</th><th>Rol</th><th>Elan</th><th>Tarix</th><th></th></tr></thead><tbody id="ut"></tbody></table></div><p class="muted">Qeyd: «Sil» yalnız profili silir. Giriş hesabını Firebase Authentication-dan silin. Qadağa üçün «Blokla» istifadə edin.</p></section>
 <section id="s-ads" class="hidden"><div class="tools"><input id="aq" class="form-control" placeholder="Marşrut, yük, sahib..."><select id="af" class="form-control"><option value="">Hamısı</option><option value="ACTIVE">Aktiv</option><option value="ARCHIVED">Arxiv</option></select><button class="btn secondary" id="ax" type="button">CSV</button></div><div class="card"><table class="admin-table"><thead><tr><th>Növ</th><th>Marşrut</th><th>Sahib</th><th>Status</th><th>Baxış</th><th></th></tr></thead><tbody id="at"></tbody></table></div></section>
 <section id="s-msgs" class="hidden"><div class="card" id="ml"></div></section>
+<section id="s-imp" class="hidden"><div class="card"><h3>WhatsApp elanlarını idxal et</h3>
+<p class="muted">Hazırlanmış <b>elanlar_hazir.json</b> faylını seçin. Elanlar bu günün tarixi ilə, "GruzNet (WhatsApp)" sahibi altında yazılır; əlaqə nömrəsi elandakı nömrədir.</p>
+<div class="grid"><div class="form-group"><label>Fayl</label><input id="imf" class="form-control" type="file" accept=".json"></div>
+<div class="form-group"><label>Elan neçə gün aktiv qalsın</label><input id="imd" class="form-control" type="number" min="1" max="14" value="3"></div></div>
+<p id="imi" class="muted"></p>
+<div class="actions"><button id="imb" class="btn" type="button" disabled>İdxal et</button><button id="imx" class="btn danger" type="button">İdxal olunanların hamısını sil</button></div></div></section>
 </main><div id="toast" class="toast hidden"></div>
 <script src="admin.js"></script></body></html>
