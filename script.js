@@ -75,15 +75,21 @@ $("auth-form").addEventListener("submit",async e=>{
     if(authMode==="login"){await auth.signInWithEmailAndPassword(mail,pw);toast(t("loginOk"),"success");}
     else{
       const name=$("reg-name").value.trim();if(name.length<2){busy(b,false);return toast(t("badName"),"error");}
-      const c=await auth.createUserWithEmailAndPassword(mail,pw);
-      await db.collection("users").doc(c.user.uid).set({fullName:name,phone,role:$("reg-role").value,language:lang,createdAt:FV.serverTimestamp()});
+      const prof={fullName:name,phone,role:$("reg-role").value,language:lang,createdAt:FV.serverTimestamp()};
+      regBusy=true;let c,fresh=true;
+      try{c=await auth.createUserWithEmailAndPassword(mail,pw);}
+      catch(er){if(er.code!=="auth/email-already-in-use")throw er;try{c=await auth.signInWithEmailAndPassword(mail,pw);}catch(_){throw er;}fresh=false;}
+      try{const ex=await db.collection("users").doc(c.user.uid).get();if(!ex.exists)await db.collection("users").doc(c.user.uid).set({...prof,authUid:c.user.uid});}
+      catch(er2){if(fresh)await c.user.delete().catch(()=>{});else await auth.signOut();throw er2;}
+      regBusy=false;await boot(c.user);
     }
-  }catch(err){const c=err.code||"";toast(["auth/invalid-credential","auth/user-not-found","auth/wrong-password"].includes(c)?t("authWrong"):c==="auth/email-already-in-use"?t("exists"):c==="auth/weak-password"?t("weakPw"):t("err"),"error");}
-  finally{busy(b,false);}
+  }catch(err){const c=err.code||"";toast(c==="permission-denied"?t("rules"):["auth/invalid-credential","auth/user-not-found","auth/wrong-password"].includes(c)?t("authWrong"):c==="auth/email-already-in-use"?t("exists"):c==="auth/weak-password"?t("weakPw"):t("err"),"error");}
+  finally{regBusy=false;busy(b,false);}
 });
 QA("[data-auth-tab]").forEach(b=>b.onclick=()=>showAuth(b.dataset.authTab));
 $("logout-btn").onclick=()=>auth.signOut();
-auth.onAuthStateChanged(async u=>{
+let regBusy=false;
+async function boot(u){
   mine=[];favs=new Set();
   if(!u){me=null;showApp();return;}
   try{
@@ -91,10 +97,12 @@ auth.onAuthStateChanged(async u=>{
     for(let i=0;!s.exists&&i<3;i++){await new Promise(r=>setTimeout(r,500));s=await db.collection("users").doc(u.uid).get();}
     if(!s.exists){await auth.signOut();return;}
     me={id:u.uid,...s.data()};
+    if(me.blocked){me=null;await auth.signOut();toast(t("blocked"),"error");return;}
     if(me.language&&L[me.language]&&me.language!==lang){lang=me.language;localStorage.setItem("language",lang);applyI18n();$("language-select").value=lang;}
     showApp();loadMine();
   }catch(err){toast(t("err"),"error");}
-});
+}
+auth.onAuthStateChanged(u=>{if(!regBusy)boot(u);});
 $("language-select").onchange=async e=>{lang=e.target.value;localStorage.setItem("language",lang);applyI18n();render();if(me){db.collection("users").doc(me.id).update({language:lang}).catch(()=>{});renderProfile();}};
 
 // ---------- Elan siyahısı ----------

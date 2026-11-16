@@ -1,0 +1,22 @@
+<!DOCTYPE html><html lang="az"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
+<title>GruzNet — Super Admin</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<link rel="stylesheet" href="style.css">
+<style>.stats{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:14px}.bars{display:flex;align-items:flex-end;gap:8px;height:110px}.bars div{flex:1;text-align:center;font-size:11px;color:var(--muted)}.bars i{display:block;background:linear-gradient(var(--primary2),var(--primary));border-radius:6px 6px 0 0;min-height:3px;margin-bottom:4px}.tools{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}.tools .form-control{flex:1;min-width:160px}.card{overflow:auto}.admin-table td .form-control{padding:6px}.msg{border-bottom:1px solid var(--border);padding:12px 0}.msg.new{border-left:4px solid var(--primary);padding-left:10px}</style></head>
+<body>
+<header class="topbar"><div class="topbar-inner"><div class="logo">Gruz<span>Net</span> <span class="badge">Super Admin</span></div>
+<div class="nav-actions"><button id="theme" class="icon-btn" type="button">🌙</button><a class="btn small secondary" href="index.html">Sayt</a><button id="out" class="btn small secondary hidden" type="button">Çıxış</button></div></div></header>
+<section id="login" class="auth-wrap"><form id="lf" class="auth-card"><h1>Super Admin</h1><p class="muted">Yalnız ADMIN rolu olan hesablar daxil ola bilər.</p>
+<div class="form-group"><label>Telefon</label><input id="ph" class="form-control" type="tel" placeholder="+994..." required></div>
+<div class="form-group"><label>Şifrə</label><input id="pw" class="form-control" type="password" required></div>
+<button class="btn" style="width:100%" type="submit">Daxil ol</button></form></section>
+<main id="panel" class="container hidden">
+<div class="tabs"><button class="tab active" data-t="dash" type="button">📊 İdarə paneli</button><button class="tab" data-t="users" type="button">👥 İstifadəçilər</button><button class="tab" data-t="ads" type="button">📦 Elanlar</button><button class="tab" data-t="msgs" type="button">✉️ Mesajlar <b id="mc"></b></button><button class="tab" data-t="ref" type="button">🔄 Yenilə</button></div>
+<section id="s-dash"><div class="stats" id="stats"></div><div class="card"><h3>Son 7 gün: yeni qeydiyyat və elan</h3><div class="bars" id="bars"></div></div></section>
+<section id="s-users" class="hidden"><div class="tools"><input id="uq" class="form-control" placeholder="Ad və ya telefon..."><button class="btn secondary" id="ux" type="button">CSV</button></div><div class="card"><table class="admin-table"><thead><tr><th>Ad</th><th>Telefon</th><th>Rol</th><th>Elan</th><th>Tarix</th><th></th></tr></thead><tbody id="ut"></tbody></table></div><p class="muted">Qeyd: «Sil» yalnız profili silir. Giriş hesabını Firebase Authentication-dan silin. Qadağa üçün «Blokla» istifadə edin.</p></section>
+<section id="s-ads" class="hidden"><div class="tools"><input id="aq" class="form-control" placeholder="Marşrut, yük, sahib..."><select id="af" class="form-control"><option value="">Hamısı</option><option value="ACTIVE">Aktiv</option><option value="ARCHIVED">Arxiv</option></select><button class="btn secondary" id="ax" type="button">CSV</button></div><div class="card"><table class="admin-table"><thead><tr><th>Növ</th><th>Marşrut</th><th>Sahib</th><th>Status</th><th>Baxış</th><th></th></tr></thead><tbody id="at"></tbody></table></div></section>
+<section id="s-msgs" class="hidden"><div class="card" id="ml"></div></section>
+</main><div id="toast" class="toast hidden"></div>
+<script src="admin.js"></script></body></html>
